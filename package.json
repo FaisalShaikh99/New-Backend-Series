@@ -1,0 +1,16 @@
+{
+  "name": "new-project",
+  "version": "1.0.0",
+  "description": "new mega project serires with chai aur code",
+  "keywords": [
+    "javascript",
+    "backend"
+  ],
+  "license": "ISC",
+  "author": "Faisal",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
