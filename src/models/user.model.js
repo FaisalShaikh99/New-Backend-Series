@@ -49,10 +49,9 @@ const userSchema = new Schema({
 }, {timestamps : true})
 
 userSchema.pre("save", async function (next) {
-    if (!this.isModified("password")) { // agar password modified nahi hua to next kardo
-        return next();
-    }
-    this.password = bcrypt.hash(this.password, 10) // jab user password create ya change karta hai to ye code se pass secure hota hai
+    if (!this.isModified("password")) return next(); // agar password modified nahi hua to next kardo
+    
+    this.password = await bcrypt.hash(this.password, 10) // jab user password create ya change karta hai to ye code se pass secure hota hai
     next() 
 })
 
