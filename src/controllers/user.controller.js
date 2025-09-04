@@ -5,6 +5,7 @@ import { User} from "../models/user.model.js" // User create karne ke liye user 
 import {uploadOnCloudinary} from "../utils/cloudinary.js"  // kisi bhi file upload karne ke liye cloudinary ki need hai
 import { ApiResponse } from "../utils/ApiResponse.js"; // response ke liye
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 const generateAccessAndRefreshToken = async(userId) => {
     try {
@@ -408,6 +409,48 @@ const getUserChannleProfile = asyncHandler( async (req,res) => {
     
 })
 
+const getWatchHistory =  asyncHandler( async (req, res) => {
+    const user = User.aggregate([
+        {
+           $match : {
+            _id : new mongoose.Types.ObjectId(req.user._id) 
+           }
+        },
+        {
+            $lookup : {
+                from : "videos",
+                localField : "watchHistory",
+                foreignField : "_id",
+                as : "watchHistory",
+                pipeline : [
+                    {
+                      $lookup : {
+                         from : "users",
+                         localField : "owner",
+                         foreignField : "_id",
+                         as : "owner",
+                         pipeline : [
+                            {
+                                $project : {
+                                    fullName : 1,
+                                    username : 1,
+                                    avatar : 1
+                                }
+                            }
+                         ]
+                       }
+                    }
+                ]
+            }
+        }
+    ])
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, user[0].watchHistory, "Watch History fetched successfully")
+    )
+})
 
 export {
     registerUser,
@@ -419,5 +462,6 @@ export {
     updateAccountDetails,
     updateUserAvatar,
     updateUserCoverImage,
-    getUserChannleProfile
+    getUserChannleProfile,
+    getWatchHistory
 }
