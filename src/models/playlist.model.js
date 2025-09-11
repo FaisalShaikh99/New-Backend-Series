@@ -7,7 +7,7 @@ const playlistSchema = new Schema(
             type : String,
             required : true
         },
-        dscription : {
+        description : {
             type : String,
             required : true
         },
@@ -19,7 +19,7 @@ const playlistSchema = new Schema(
         ],
         owner : {
             type : Schema.Types.ObjectId,
-            ref : "USer"
+            ref : "User"
         }
     },
     {

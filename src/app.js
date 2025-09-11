@@ -15,7 +15,7 @@ const app = express();
 // frontend (React, Angular, Vue) alag port/domain pe chalega aur backend alag port pe 
 // uske liye backend ko explicitly allow karna padta hai
 app.use(cors({
-    origin: process.env.CORS_ORIGIN, // only yahi origin allowed hoga ("http://localhost:8000")
+    origin: process.env.CORS_ORIGIN || "http://localhost:8000", // only yahi origin allowed hoga ("http://localhost:8000")
     credentials: true                // frontend ke saath cookies share karne ke liye true
 }))
 
@@ -37,10 +37,17 @@ app.use(cookieParser())
 
 // user related routes import kiya (login, signup, profile wagaira isi me honge)
 import userRouter from './routes/user.route.js'
-
+import commentRouter from './routes/comment.route.js'
+import likeRouter from './routes/likes.route.js'
+import tweetRouter from './routes/tweet.route.js'
+import playlistRouter from './routes/playlist.route.js'
 // jab bhi request "/api/v1/users" se start hogi, wo userRouter ke andar jayegi
 // example: POST /api/v1/users/register → user.route.js me handle hoga
 app.use("/api/v1/users", userRouter)
+app.use("/api/v1/comments", commentRouter)
+app.use("/api/v1/likes", likeRouter)
+app.use("/api/v1/tweets", tweetRouter)
+app.use("/api/v1/playlist", playlistRouter)
 
 // app ko export kiya taki index.js (ya server.js) file me use kar sakein
 export { app }

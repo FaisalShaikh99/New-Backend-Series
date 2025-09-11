@@ -1,7 +1,7 @@
 // controllers (user.controller.js) → business logic handle karta hai (Cloudinary me upload, DB me save, etc.).
 import { asyncHandler } from "../utils/asyncHandler.js"; // ye controllers ko handle karta hai
 import {ApiError} from "../utils/ApiError.js" // isse ham error handing karna aasan hoga jis code ApiError file me dekh sakte ho
-import { User} from "../models/user.model.js" // User create karne ke liye user model ki need hogi
+import {User} from "../models/user.model.js" // User create karne ke liye user model ki need hogi
 import {uploadOnCloudinary} from "../utils/cloudinary.js"  // kisi bhi file upload karne ke liye cloudinary ki need hai
 import { ApiResponse } from "../utils/ApiResponse.js"; // response ke liye
 import jwt from "jsonwebtoken";

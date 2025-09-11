@@ -117,7 +117,7 @@ const deleteComment = asyncHandler( async (req, res) => {
     }
 
     if(comment.owner.toString() !== userId.toString()) {
-        throw new ApiError(401, "You are not allowed to update this comment")
+        throw new ApiError(401, "You are not allowed to delete this comment")
     }
 
     await comment.deleteOne()
