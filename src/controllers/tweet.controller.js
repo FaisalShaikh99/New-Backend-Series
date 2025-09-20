@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
-import { Tweet } from "../models/tweet.model";
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponse";
-import { asyncHandler } from "../utils/asyncHandler";
+import { Tweet } from "../models/tweet.model.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 
 const createTweet = asyncHandler( async (req, res) => {
@@ -25,7 +25,7 @@ const createTweet = asyncHandler( async (req, res) => {
 })
 
 
-const getUserTweet = asyncHandler( async (req, res) => {
+const getUserTweets = asyncHandler( async (req, res) => {
     const userId = req.user._id
 
     if (!userId) {
@@ -124,7 +124,7 @@ const deleteTweet = asyncHandler(async (req, res) => {
 
 export {
     createTweet,
-    getUserTweet,
+    getUserTweets,
     updateTweet,
     deleteTweet
 }

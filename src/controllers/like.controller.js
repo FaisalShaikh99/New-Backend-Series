@@ -1,8 +1,8 @@
 import mongoose, { isValidObjectId } from "mongoose";
-import { Like } from "../models/like.model";
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponse";
-import { asyncHandler } from "../utils/asyncHandler";
+import { Like } from "../models/like.model.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 const toggleVideoLike = asyncHandler( async (req, res) => {
      const {videoId} =  req.params
@@ -31,7 +31,7 @@ const toggleVideoLike = asyncHandler( async (req, res) => {
             new ApiResponse(200, null, "Video unliked successfully ")
            )
       }
-    //   const likes = await Like.apply(
+    //   const likes = await Like.apply( // not execute apply method on mongoose
     //     isLiked = !isLiked,
     //     isLiked = !isLiked
     //   )
@@ -49,7 +49,7 @@ const toggleVideoLike = asyncHandler( async (req, res) => {
            )
 })
 
-const toggleCommentike = asyncHandler( async (req, res) => {
+const toggleCommentLike = asyncHandler( async (req, res) => {
       const {commentId} =  req.params
       const userId = req.user._id
     //   let isLiked = false;
@@ -140,7 +140,7 @@ const toggleTweetLike = asyncHandler( async (req, res) => {
            )
 })
 
-const getLikedVideo = asyncHandler ( async (req, res) => {
+const getLikedVideos = asyncHandler ( async (req, res) => {
     const  userId =  req.user._id
   // check if valid ObjectId
      if (!isValidObjectId(userId)) {
@@ -167,7 +167,7 @@ const getLikedVideo = asyncHandler ( async (req, res) => {
 
 export {
     toggleVideoLike,
-    toggleCommentike,
+    toggleCommentLike,
     toggleTweetLike,
-    getLikedVideo
+    getLikedVideos
 }

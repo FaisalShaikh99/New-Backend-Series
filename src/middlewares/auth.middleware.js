@@ -20,7 +20,7 @@ export const verifyJWT = asyncHandler( async (req, _, next) => {
           throw new ApiError(401, "Invalid accessToken")
       }
   
-      req.user =  user; // yaha se hame req karne se user mil jata hai db se
+      req.user = user; // yaha se hame req karne se user mil jata hai db se
       next(); // abb middleware next kar deta hai fir compliler logout per jata hai
   } catch (error) {
      throw new ApiError(401, error?.message || "Invalid access token")

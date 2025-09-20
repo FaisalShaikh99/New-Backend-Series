@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
-import { Playlist } from "../models/playlist.model";
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponse";
-import {asyncHandler} from "../utils/asyncHandler"
+import { Playlist } from "../models/playlist.model.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import {asyncHandler} from "../utils/asyncHandler.js"
 
 const createPlaylist = asyncHandler( async (req, res) => {
       const {name, description} = req.body
@@ -32,7 +32,7 @@ const createPlaylist = asyncHandler( async (req, res) => {
       )
 })
 
-const getUserPlaylist = asyncHandler( async (req, res) => {
+const getUserPlaylists = asyncHandler( async (req, res) => {
     const {userId} = req.params
 
     if (!userId) {
@@ -84,7 +84,7 @@ const getPlaylistById = asyncHandler(async (req, res) => {
 })
 
 const addVideoToPlaylist = asyncHandler(async (req, res) => {
-    const {playlistId, videoId} = req.params
+    const {videoId, playlistId} = req.params
     const userId = req.user._id
     if (!playlistId || !videoId) {
         throw new ApiError(404, "Playlist and video are required")
@@ -99,10 +99,12 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
         throw new ApiError(403, "You are not allowed to modify this playlist")
     }
     
+    
     // check video is already exist or not in playlist
-    if (playlist.video.include(videoId)) {
+    if (playlist.video.includes(videoId)) {
         throw new ApiError(400, "This video is already exist in playlist")
     }
+
 
     playlist.video.push(videoId)
     await playlist.save()
@@ -209,7 +211,7 @@ const deletePlaylist = asyncHandler(async (req, res) => {
 
 export {
     createPlaylist,
-    getUserPlaylist,
+    getUserPlaylists,
     getPlaylistById,
     addVideoToPlaylist,
     removeVideoFromPlaylist,
