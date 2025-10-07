@@ -14,7 +14,7 @@ const toggleSubscription =  asyncHandler( async (req, res) => {
       if (!channelId) {
          throw new ApiError(404, "Channel id is required")
       }
-
+       console.log("ChannelId from frontend:", req.params.channelId)
       const existSubscribed = await Subscription.findOne(
         {
             subscriber : userId,

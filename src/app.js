@@ -1,62 +1,136 @@
+// ========================================
+// EXPRESS APP CONFIGURATION
+// ========================================
+// Ye file Express server ka main configuration handle karti hai
+// Middlewares, routes, aur CORS setup yahan hota hai
 
-// express import kiya (server banane ke liye use hota hai)
-import express from "express"
+// ========== CORE IMPORTS ==========
+import express from "express"        // Express framework
+import cors from "cors"              // Cross-Origin Resource Sharing
+import cookieParser from "cookie-parser"  // Cookie parsing middleware
 
-// → frontend aur backend alag domain/port par ho to bhi request allow karne ke liye
-import cors from "cors" 
-
-// → cookies ko easily access karne ke liye (login/auth ke time JWT token ya session store karne ke liye use hota hai)
-import cookieParser from "cookie-parser"  
-
-// express ka object banaya (ye app pura server represent karega)
+// ========== EXPRESS APP INITIALIZATION ==========
+// Express ka main object create karo
 const app = express(); 
 
-// --------------------------- CORS CONFIG ---------------------------
-// frontend (React, Angular, Vue) alag port/domain pe chalega aur backend alag port pe 
-// uske liye backend ko explicitly allow karna padta hai
+// ========================================
+// CORS CONFIGURATION
+// ========================================
+// Frontend aur backend alag ports pe chalte hain
+// CORS allow karta hai ki frontend backend se data access kar sake
 app.use(cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:8000", // only yahi origin allowed hoga ("http://localhost:8000")
-    credentials: true                // frontend ke saath cookies share karne ke liye true
+    origin: process.env.CORS_ORIGIN, // Sirf specific origin allow karo
+    credentials: true                // Cookies share karne ke liye true
 }))
 
-// --------------------------- MIDDLEWARES ---------------------------
+// ========================================
+// MIDDLEWARES CONFIGURATION
+// ========================================
 
-// JSON body parse karne ke liye (limit = 16kb set kiya)
-app.use(express.json({ limit: "16kb" }))
+// ========== JSON PARSING MIDDLEWARE ==========
+// Request body mein JSON data parse karne ke liye
+app.use(express.json({ 
+    limit: "16kb"  // Maximum 16KB JSON data allow karo
+}))
 
-// URL-encoded data parse karne ke liye (form submissions, etc.)
-// extended: true → nested objects ko parse karne dega
-app.use(express.urlencoded({ extended: true, limit: "16kb" }))
+// ========== URL-ENCODED PARSING MIDDLEWARE ==========
+// Form submissions aur URL-encoded data parse karne ke liye
+app.use(express.urlencoded({ 
+    extended: true,  // Nested objects ko parse karne dega
+    limit: "16kb"    // Maximum 16KB data allow karo
+}))
 
-// static files serve karne ke liye (e.g. images, css, js jo "public" folder me hai)
+// ========== STATIC FILES MIDDLEWARE ==========
+// Public folder se static files serve karne ke liye
+// Images, CSS, JS files jo "public" folder mein hain
 app.use(express.static("public"))
 
-// cookie-parser ko use kiya → ab hum req.cookies se cookies access kar sakte hain
+// ========== COOKIE PARSING MIDDLEWARE ==========
+// Request cookies ko parse karne ke liye
+// Ab hum req.cookies se cookies access kar sakte hain
 app.use(cookieParser())
 
-// user related routes import kiya (login, signup, profile wagaira isi me honge)
+// ========================================
+// ROUTE IMPORTS
+// ========================================
+// Sabhi route files import karo
+
+// ========== USER ROUTES ==========
+// User related operations (register, login, profile, etc.)
 import userRouter from './routes/user.route.js'
+
+// ========== CONTENT ROUTES ==========
+// Video, comments, likes, tweets related operations
 import commentRouter from './routes/comment.route.js'
 import likeRouter from './routes/likes.route.js'
 import tweetRouter from './routes/tweet.route.js'
-import playlistRouter from './routes/playlist.route.js'
-import subscriptionRouter from './routes/subscription.route.js'
 import videoRouter from "./routes/video.route.js"
+
+// ========== PLAYLIST ROUTES ==========
+// Playlist management
+import playlistRouter from './routes/playlist.route.js'
+
+// ========== SUBSCRIPTION ROUTES ==========
+// Channel subscription management
+import subscriptionRouter from './routes/subscription.route.js'
+
+// ========== DASHBOARD ROUTES ==========
+// Analytics aur dashboard data
 import dashboardRouter from "./routes/dashboard.route.js"
+
+// ========== HEALTH CHECK ROUTES ==========
+// Server health monitoring
 import healthCheckRouter from "./routes/healthCheck.route.js"
 
-// jab bhi request "/api/v1/" se start hogi, wo userRouter ke andar jayegi
-// example: POST /api/v1/register → user.route.js me handle hoga
+// ========================================
+// ROUTE CONFIGURATION
+// ========================================
+// Har route ko specific path pe mount karo
+
+// ========== API VERSIONING ==========
+// "/api/v1/" prefix se sabhi routes start hongi
+// Ye API versioning ke liye best practice hai
+
+// ========== USER ROUTES ==========
+// POST /api/v1/users/register → User registration
+// POST /api/v1/users/login → User login
+// GET /api/v1/users/current-user → Current user data
 app.use("/api/v1/users", userRouter)
+
+// ========== VIDEO ROUTES ==========
+// Video upload, fetch, update operations
 app.use("/api/v1/video", videoRouter)
+
+// ========== COMMENT ROUTES ==========
+// Video comments management
 app.use("/api/v1/comments", commentRouter)
+
+// ========== LIKE ROUTES ==========
+// Video likes/dislikes management
 app.use("/api/v1/likes", likeRouter)
+
+// ========== TWEET ROUTES ==========
+// Tweet management (if implemented)
 app.use("/api/v1/tweets", tweetRouter)
+
+// ========== PLAYLIST ROUTES ==========
+// User playlists management
 app.use("/api/v1/playlist", playlistRouter)
+
+// ========== SUBSCRIPTION ROUTES ==========
+// Channel subscription management
 app.use("/api/v1/subscription", subscriptionRouter)
+
+// ========== DASHBOARD ROUTES ==========
+// Analytics aur dashboard data
 app.use("/api/v1/dashboard", dashboardRouter)
+
+// ========== HEALTH CHECK ROUTES ==========
+// Server health monitoring
 app.use("/api/v1/healthCheck", healthCheckRouter)
 
-
-// app ko export kiya taki index.js (ya server.js) file me use kar sakein
+// ========================================
+// EXPORT APP
+// ========================================
+// App object ko export karo taki index.js mein use kar sakein
 export { app }
