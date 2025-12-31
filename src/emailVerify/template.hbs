@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Email Verification - VideoTube</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body style="margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background:#f4f4f4;">
+  <div style="max-width:600px;margin:40px auto;background:#ffffff;border-radius:12px;overflow:hidden;">
+    
+    <div style="text-align:center;padding:25px;border-bottom:1px solid #e5e7eb;">
+      <h1 style="margin:0;color:#4F46E5;">▶️ VideoTube</h1>
+    </div>
+
+    <div style="padding:30px;color:#374151;">
+      <h2 style="color:#111827;">Activate Your Account</h2>
+
+      <p>Hello,</p>
+
+      <p>
+        Thank you for joining <b>VideoTube</b>!  
+        Please verify your email address to activate your account.
+      </p>
+
+      <div style="text-align:center;margin:30px 0;">
+        <a
+          href="{{verifyUrl}}"
+          target="_blank"
+          style="
+            display:inline-block;
+            padding:14px 30px;
+            background:#4F46E5;
+            color:#ffffff;
+            text-decoration:none;
+            border-radius:8px;
+            font-weight:bold;
+          "
+        >
+          Verify My Email
+        </a>
+      </div>
+
+      <p>
+        If the button doesn’t work, copy and paste this link:
+      </p>
+
+      <p style="word-break:break-all;">
+        <a href="{{verifyUrl}}" style="color:#4F46E5;">
+          {{verifyUrl}}
+        </a>
+      </p>
+
+      <p>If you didn’t create an account, you can safely ignore this email.</p>
+    </div>
+
+    <div style="font-size:12px;color:#9ca3af;text-align:center;padding:20px;border-top:1px solid #e5e7eb;">
+      © 2025 VideoTube. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>

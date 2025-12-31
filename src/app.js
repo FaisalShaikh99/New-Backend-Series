@@ -24,6 +24,19 @@ app.use(cors({
 }))
 
 // ========================================
+// SECURITY HEADERS FOR GOOGLE OAUTH
+// ========================================
+// Google OAuth ke liye COOP header set karo
+app.use((req, res, next) => {
+    // COOP: Google login ke liye postMessage ko allow karta hai.
+    res.setHeader('Cross-Origin-Opener-Policy', 'unsafe-none'); 
+    
+    // COEP: Ise hata do jab tak aapko Cross-Origin Isolation ki specifically zarurat na ho.
+    // res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp'); // Hata diya gaya
+    next();
+})
+
+// ========================================
 // MIDDLEWARES CONFIGURATION
 // ========================================
 
@@ -82,19 +95,7 @@ import dashboardRouter from "./routes/dashboard.route.js"
 // Server health monitoring
 import healthCheckRouter from "./routes/healthCheck.route.js"
 
-// ========================================
-// ROUTE CONFIGURATION
-// ========================================
-// Har route ko specific path pe mount karo
 
-// ========== API VERSIONING ==========
-// "/api/v1/" prefix se sabhi routes start hongi
-// Ye API versioning ke liye best practice hai
-
-// ========== USER ROUTES ==========
-// POST /api/v1/users/register → User registration
-// POST /api/v1/users/login → User login
-// GET /api/v1/users/current-user → Current user data
 app.use("/api/v1/users", userRouter)
 
 // ========== VIDEO ROUTES ==========
@@ -128,6 +129,14 @@ app.use("/api/v1/dashboard", dashboardRouter)
 // ========== HEALTH CHECK ROUTES ==========
 // Server health monitoring
 app.use("/api/v1/healthCheck", healthCheckRouter)
+
+// ========================================
+// GLOBAL ERROR HANDLER MIDDLEWARE
+// ========================================
+// Ye middleware sabhi errors ko catch karega
+// IMPORTANT: Isko sabse aakhir mein add karna hai!
+import { errorHandler } from './middlewares/error.middleware.js'
+app.use(errorHandler)
 
 // ========================================
 // EXPORT APP

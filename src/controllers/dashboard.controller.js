@@ -21,6 +21,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
     { $match: { owner: userId } },
     { $group: { _id: null, totalViews: { $sum: "$views" } } }
   ])
+  
   const totalViews = viewsAgg[0]?.totalViews || 0
 
   // total subscribers

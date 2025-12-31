@@ -17,12 +17,13 @@ const userSchema = new Schema(
         // ========== BASIC USER INFO ==========
         username: {
             type: String,
-            required: true,        // Compulsory field
+          //  required: true,        // Compulsory field
             unique: true,          // Har username unique hona chahiye
             lowercase: true,       // Always store in lowercase
             trim: true,            // Remove extra spaces
             index: true            // Database index for faster queries
         },
+
         email: {
             type: String,
             required: true,        // Email field mandatory
@@ -30,23 +31,52 @@ const userSchema = new Schema(
             lowercase: true,       // Always store in lowercase
             trim: true,            // Remove extra spaces
         },
+
         fullName: {
             type: String,
-            required: true,        // Full name mandatory
+           // required: true,        // Full name mandatory
             trim: true,            // Remove extra spaces
             index: true            // Index for faster search
         },
-        
+
+        googleId: {             // thridparty authentication
+            type: String,
+            default: null
+        },
+
         // ========== PROFILE IMAGES ==========
         avatar: {
             type: String,          // Cloudinary URL store karenge
             required: true,        // Profile picture mandatory
         },
+
         coverImage: {
             type: String,          // Cover image URL (optional)
         },
+
+        isVerified : {
+            type : Boolean,
+            default:false
+        },
         
-        // ========== USER ACTIVITY ==========
+        isLoggedIn : {
+            type : Boolean,
+            default : false
+        },
+
+        otp : {
+            type : String ,
+            default : null
+        },
+
+        otpExpiry  :{
+            type: Date,
+            default : null
+        },
+        isOtpVerified: {
+            type: Boolean,
+            default: false
+        },
         watchHistory: [
             {
                 type: Schema.Types.ObjectId,  // Video ka reference
@@ -57,8 +87,10 @@ const userSchema = new Schema(
         // ========== SECURITY FIELDS ==========
         password: {
             type: String,
-            required: [true, 'Password is required']  // Custom error message
+            required: function () {
+            return !this.googleId; 
         },
+    },
         refreshToken: {
             type: String          // JWT refresh token store karte hain
         }
@@ -76,17 +108,17 @@ const userSchema = new Schema(
 // ========== PASSWORD HASHING MIDDLEWARE ==========
 // Ye function automatically chalega jab bhi user save hoga
 userSchema.pre("save", async function (next) {
-    // Sirf tab hash karo jab password modify ho raha ho
     if(!this.isModified("password")) return next();
 
-    // Password ko 10 rounds mein hash karo (salt rounds)
+    if (!this.password) {
+        return next();
+    }
+
     this.password = await bcrypt.hash(this.password, 10)
+    console.log(this.password);
     next()
 })
 
-// ========================================
-// INSTANCE METHODS (User ke methods)
-// ========================================
 
 // ========== PASSWORD VERIFICATION METHOD ==========
 // Ye method check karta hai ki entered password correct hai ya nahi
@@ -112,7 +144,7 @@ userSchema.methods.generateAccessToken = function(){
     )
 }
 
-// ========== REFRESH TOKEN GENERATION ==========
+//  REFRESH TOKEN GENERATION 
 // Long-lived token (7-30 days) - Access token refresh karne ke liye
 userSchema.methods.generateRefreshToken = function(){
     return jwt.sign(

@@ -6,16 +6,20 @@ import {
     publishAVideo,
     togglePublishStatus,
     updateVideo,
+    searchVideos,
 } from "../controllers/video.controller.js"
 import {verifyJWT} from "../middlewares/auth.middleware.js"
 import {upload} from "../middlewares/multer.middleware.js"
 
 const router = Router();
+router.get("/",getAllVideos);
+// Search route should be above the dynamic :videoId route to avoid collision
+router.get('/search', searchVideos);
+router.get("/:videoId", getVideoById);
 router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
 
 router
     .route("/")
-    .get(getAllVideos)
     .post(
         upload.fields([
             {
@@ -33,7 +37,6 @@ router
 
 router
     .route("/:videoId")
-    .get(getVideoById)
     .delete(deleteVideo)
     .patch(upload.single("thumbnail"), updateVideo);
 

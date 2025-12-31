@@ -4,50 +4,40 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
-const toggleVideoLike = asyncHandler( async (req, res) => {
-     const {videoId} =  req.params
-     const userId = req.user._id
-    //   let isLiked = false;
+const toggleVideoLike = asyncHandler(async (req, res) => {
+  const { videoId } = req.params;
+  const userId = req.user._id;
 
-     // check if valid ObjectId
-        if (!isValidObjectId(videoId)) {
-            throw new ApiError(400, "Invalid video Id");
-        }
-      if (!videoId) {
-         throw new ApiError(401, "video Id is required");
-      }
-    
-      const existingLike = await Like.findOne(
-        {
-            video : videoId,
-            likedBy : userId
-        }
-      )
+  if (!videoId || !isValidObjectId(videoId)) {
+  throw new ApiError(400, `Invalid video Id: ${videoId}`);
+  }
 
-      if (existingLike) { // if like is
-           // unlike
-           await Like.deleteOne({ _id: existingLike._id })
-           return res.status(200).json(
-            new ApiResponse(200, null, "Video unliked successfully ")
-           )
-      }
-    //   const likes = await Like.apply( // not execute apply method on mongoose
-    //     isLiked = !isLiked,
-    //     isLiked = !isLiked
-    //   )
+  const existingLike = await Like.findOne({ video: videoId, likedBy: userId });
 
-       // new like
-      const newLike = await Like.create(
-         {
-            video : videoId,
-            likedBy : userId
-        }
-      )
-      
-      return res.status(200).json(
-            new ApiResponse(200, newLike, "Video liked successfully ")
-           )
-})
+  let action = "liked";
+
+  if (existingLike) {
+    // Unlike
+    await Like.deleteOne({ _id: existingLike._id });
+    action = "unliked";
+  } else {
+    // Like
+    await Like.create({ video: videoId, likedBy: userId });
+  }
+
+  // Total likes count for this video
+  const likesCount = await Like.countDocuments({ video: videoId });
+
+  return res.status(200).json({
+    success: true,
+    data: {
+      videoId,
+      likesCount,
+      action, // "liked" or "unliked"
+    },
+    message: `Video ${action} successfully`,
+  });
+});
 
 const toggleCommentLike = asyncHandler( async (req, res) => {
       const {commentId} =  req.params
