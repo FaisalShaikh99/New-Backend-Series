@@ -11,7 +11,8 @@ import {User} from "../models/user.model.js"            // User model for databa
 import {uploadOnCloudinary} from "../utils/cloudinary.js"  // File upload utility
 import { ApiResponse } from "../utils/ApiResponse.js";  // Standardized response format
 import jwt from "jsonwebtoken";                         // JWT token operations
-import mongoose from "mongoose";                        // MongoDB operations
+import mongoose from "mongoose"; 
+import fs from "fs";                       
 import { OAuth2Client } from "google-auth-library";
 import { verifyMail } from "../emailVerify/verifyMail.js";
 import { Session } from "../models/session.Model.js";
@@ -250,31 +251,34 @@ const  loginUser =  asyncHandler( async (req, res) => {
    await user.save({ validateBeforeSave: false });  
    const loggedInUser = await User.findById(user._id).select("-password -refreshToken") 
 
-    user.isLoggedIn = true;
-    await user.save()
+   user.isLoggedIn = true;
+   await user.save()
 
-   // ========== COOKIE OPTIONS ==========
-   // Security ke liye cookie options set karo
-   const options = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict"
-   }
 
    // ========== SUCCESS RESPONSE ==========
-   return res   
-   .status(200)
-   .cookie("accessToken", accessToken, options)  // Access token cookie mein
-   .cookie("refreshToken", refreshToken, options) // Refresh token cookie mein
-   .json(
-        new ApiResponse(
-            200,
-            {
-                user : loggedInUser, accessToken, refreshToken
-            },
-            `Welcome back ${user.username}`
-        )
-   )
+   return res
+  .status(200)
+  .cookie("accessToken", accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 15 * 60 * 1000
+  })
+  .cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000
+  })
+  .json(
+    new ApiResponse(
+      200,
+      {
+        user: loggedInUser
+      },
+      `Welcome back ${user.username}`
+    )
+  );
 })
 
 // ============ THIRD PARTY AUTHENTICATION ===========
@@ -324,12 +328,13 @@ const googleLogin = asyncHandler(async (req, res) => {
             isVerified : true  
         });
     }
-    console.log(user);
 
     // STEP 4: Generate Tokens
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
 
+    user.isLoggedIn = true;
+    await user.save()
     const options = { httpOnly: true, secure: true };
 
     return res.status(200)
@@ -484,35 +489,35 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   }
 
   try {
-    // 1️⃣ Verify incoming refresh token
+    //  Verify incoming refresh token
     const decodedToken = jwt.verify(
       incomingRefreshToken,
       process.env.REFRESH_TOKEN_SECRET
     );
 
-    // 2️⃣ Find user by decoded token _id
+    //  Find user by decoded token _id
     const user = await User.findById(decodedToken?._id);
 
     if (!user) {
       throw new ApiError(401, "Invalid refresh token - user not found");
     }
 
-    // 3️⃣ Validate refresh token with DB
+    //  Validate refresh token with DB
     if (incomingRefreshToken !== user.refreshToken) {
       throw new ApiError(401, "Refresh token expired or already used");
     }
 
-    // 4️⃣ Generate new tokens
+    //  Generate new tokens
     const { accessToken, refreshToken: newRefreshToken } =
       await generateAccessAndRefreshToken(user._id);
 
     const options = {
       httpOnly: true,
       secure: true, // production ke liye
-      sameSite: "strict",
+      sameSite: "lax"
     };
 
-    // 5️⃣ Send cookies + response
+    //  Send cookies + response
     return res
       .status(200)
       .cookie("accessToken", accessToken, options)
@@ -520,7 +525,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       .json(
         new ApiResponse(
           200,
-          { accessToken, refreshToken: newRefreshToken },
+          null,
           "Access token refreshed successfully"
         )
       );
@@ -587,8 +592,8 @@ const updateUserAvatar = asyncHandler( async(req, res) => {
     // ========== CLOUDINARY UPLOAD ==========
     const avatar = await uploadOnCloudinary(avatarLocalPath)
 
-    if (!avatar.url) {
-        throw new ApiError(400, "Error while uploading on avatar");
+    if (!avatar || !avatar.url) {
+        throw new ApiError(400, "Avatar upload failed");
     }
     
     // ========== DATABASE UPDATE ==========
@@ -623,9 +628,8 @@ const updateUserCoverImage = asyncHandler( async(req, res) => {
 
     // ========== CLOUDINARY UPLOAD ==========
     const coverImage = await uploadOnCloudinary(coverImageLocalPath)
-
-    if (!coverImage.url) {
-        throw new ApiError(400, "Error while uploading on cover image");
+    if (!coverImage || !coverImage.url) {
+    throw new ApiError(500, "Cover image upload failed");
     }
 
     // ========== DATABASE UPDATE ==========
@@ -785,6 +789,7 @@ export {
     logoutUser,
     forgotPassword,
     verifyOTP,
+    generateAccessAndRefreshToken,
     refreshAccessToken,
     changeCurrentPassword,
     getCurrentUser,

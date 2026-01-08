@@ -7,14 +7,14 @@ import { changeCurrentPassword,
          loginUser,
          googleLogin, 
          logoutUser, 
-         refreshAccessToken, 
          registerUser, 
          updateAccountDetails,
          updateUserAvatar, 
          updateUserCoverImage,
          verifyEmail,
          forgotPassword,
-         verifyOTP} from "../controllers/user.controller.js";
+         verifyOTP,
+         refreshAccessToken} from "../controllers/user.controller.js";
 import {upload} from "../middlewares/multer.middleware.js"
 import {verifyJWT} from "../middlewares/auth.middleware.js"
 

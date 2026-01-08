@@ -52,6 +52,7 @@ const userSchema = new Schema(
 
         coverImage: {
             type: String,          // Cover image URL (optional)
+            default : ""
         },
 
         isVerified : {
